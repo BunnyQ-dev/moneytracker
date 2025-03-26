@@ -1,3 +1,4 @@
+package com.example.moneytracker.data.models
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
 
