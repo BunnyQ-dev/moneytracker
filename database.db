@@ -1,0 +1,156 @@
+-- Увімкнення підтримки зовнішніх ключів
+PRAGMA foreign_keys = ON;
+
+----------------------------
+-- Таблиця users
+----------------------------
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    email TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Вставка даних у таблицю users
+INSERT INTO users (id, username, email, password, created_at) VALUES
+(1, 'xxx', 'xxx@gmail.com', '$2y$10$m2jDcyh1YUpRS45YRqC5Xu9kQT6c0ZlOk.oeOBvwX/M0FvICsD/wS', '2024-11-08 19:47:21'),
+(2, 'xx', 'xx@gmail.com', '$2y$10$7MXVZp7a2p7WmhYtD2Zn2eosm1LUk9dhid/AewUIAEi7gnGsIRhQ6', '2024-11-08 19:55:18'),
+(3, 'x', 'x@gmail.com', '$2y$10$UspXdAQFMjXQ7XfNOeAXQeb7s6EN/CYuFEjl1ZIQYQ6701ts3rHo2', '2025-01-08 08:57:41'),
+(4, 'xy', 'xy@gmail.com', '$2y$10$Bwyq6nYIif8K7UYMa0mnROD9w71P9C8r15MgJbzvXj2rrW6b8FMUy', '2025-01-08 09:02:37');
+
+----------------------------
+-- Таблиця balance
+----------------------------
+CREATE TABLE balance (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    balance DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Вставка даних у таблицю balance
+INSERT INTO balance (id, user_id, balance) VALUES
+(1, 2, 28000.00),
+(2, 1, 880.00),
+(3, 3, 2000.00),
+(4, 4, 500.00);
+
+----------------------------
+-- Таблиця expenses
+----------------------------
+CREATE TABLE expenses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    category TEXT NOT NULL,
+    date DATE NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Вставка даних у таблицю expenses
+INSERT INTO expenses (id, user_id, amount, category, date) VALUES
+(1, 2, 20.00, 'Food', '2024-11-22'),
+(2, 2, 400.00, 'Clothing', '2024-11-22'),
+(3, 2, 1.00, 'Clothing', '2024-11-22'),
+(4, 2, 1.00, 'Clothing', '2024-11-22'),
+(5, 2, 1.00, 'Clothing', '2024-11-22'),
+(6, 2, 317.00, 'Other', '2024-11-28'),
+(7, 2, 200.00, 'Clothing', '2023-12-07'),
+(8, 2, 50.00, 'Food', '2024-05-17'),
+(9, 2, 100.00, 'Clothing', '2024-11-04'),
+(10, 2, 30.00, 'Clothing', '2025-01-08'),
+(11, 2, 30.00, 'Food', '2025-01-08'),
+(12, 2, 61.00, 'Clothing', '2025-01-03');
+
+----------------------------
+-- Таблиця goals
+----------------------------
+CREATE TABLE goals (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    target_amount DECIMAL(10,2) NOT NULL,
+    saved_amount DECIMAL(10,2) DEFAULT 0.00,
+    is_finished BOOLEAN DEFAULT 0,
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- (Дані для таблиці goals не були надані у вихідному дампі)
+
+----------------------------
+-- Таблиця income
+----------------------------
+CREATE TABLE income (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    category TEXT NOT NULL,
+    date DATE NOT NULL,
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Вставка даних у таблицю income
+INSERT INTO income (id, user_id, amount, category, date) VALUES
+(1, 2, 100.00, 'Work', '2024-11-22'),
+(2, 2, 45.00, 'Work', '2024-11-22'),
+(3, 2, 1.00, 'Work', '2024-11-22'),
+(4, 2, 1.00, 'Work', '2024-11-22'),
+(5, 2, 4.00, 'Work', '2024-11-22'),
+(6, 2, 15.00, 'Work', '2024-11-22'),
+(7, 2, 150.00, 'Other', '2024-11-22'),
+(8, 2, 1000.00, 'Work', '2024-11-22'),
+(9, 2, 1.00, 'Work', '2024-11-22'),
+(10, 2, 1.00, 'Work', '2024-11-22'),
+(11, 2, 1.00, 'Work', '2024-11-22'),
+(12, 2, 1050.00, 'Work', '2024-11-23'),
+(13, 2, 100.00, 'Work', '2024-11-23'),
+(14, 1, 200.00, 'Work', '2024-11-24'),
+(15, 2, 500.00, 'Other', '2024-11-27'),
+(16, 2, 100.00, 'Work', '2024-11-07'),
+(17, 2, 10.00, 'Work', '2023-11-30'),
+(18, 2, 390.00, 'Work', '2023-12-06'),
+(19, 2, 100.00, 'Other', '2024-05-17'),
+(20, 2, 150.00, 'Other', '2024-11-07'),
+(21, 2, 120.00, 'Work', '2025-01-08'),
+(22, 2, 11.00, 'Work', '2024-12-27'),
+(23, 3, 1000.00, 'Work', '2025-01-08'),
+(24, 2, 100.00, 'Work', '2025-01-01');
+
+----------------------------
+-- Таблиця transactions
+----------------------------
+CREATE TABLE transactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    type TEXT NOT NULL CHECK (type IN ('income','expense')),
+    category TEXT NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user_id) REFERENCES users(id)
+);
+
+-- Вставка даних у таблицю transactions
+INSERT INTO transactions (id, user_id, type, category, amount, date) VALUES
+(1, 2, 'income', 'Other', 300.00, '2024-06-26 22:00:00'),
+(2, 2, 'income', 'Work', 500.00, '2024-02-12 23:00:00'),
+(3, 2, 'expense', 'Clothing', 100.00, '2024-11-04 23:00:00'),
+(4, 2, 'income', 'Work', 150.00, '2024-01-07 23:00:00'),
+(5, 2, 'expense', 'Food', 50.00, '2024-11-20 23:00:00'),
+(6, 2, 'income', 'Other', 800.00, '2024-02-12 23:00:00'),
+(7, 2, 'expense', 'Clothing', 200.00, '2024-11-24 23:00:00'),
+(8, 4, 'expense', 'Clothing', 500.00, '2024-12-07 23:00:00'),
+(9, 4, 'income', 'Work', 500.00, '2025-01-07 23:00:00'),
+(10, 3, 'income', 'Work', 500.00, '2025-01-07 23:00:00'),
+(11, 2, 'expense', 'Other', 10.00, '2025-01-07 23:00:00'),
+(12, 2, 'income', 'Work', 100.00, '2025-01-07 23:00:00'),
+(13, 2, 'income', 'Work', 120.00, '2025-01-07 23:00:00'),
+(14, 2, 'income', 'Work', 11.00, '2024-12-26 23:00:00'),
+(15, 2, 'expense', 'Clothing', 30.00, '2025-01-07 23:00:00'),
+(16, 2, 'expense', 'Clothing', 30.00, '2025-01-07 23:00:00'),
+(17, 2, 'expense', 'Clothing', 30.00, '2025-01-07 23:00:00'),
+(18, 2, 'expense', 'Food', 30.00, '2025-01-07 23:00:00'),
+(19, 3, 'income', 'Work', 1000.00, '2025-01-07 23:00:00'),
+(20, 2, 'income', 'Work', 100.00, '2024-12-31 23:00:00'),
+(21, 2, 'expense', 'Clothing', 61.00, '2025-01-02 23:00:00');
+
